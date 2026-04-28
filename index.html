@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>余白おみくじ</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -138,6 +136,13 @@
       margin-bottom: 4px;
     }
 
+    .notice {
+      margin-top: 16px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #8c8176;
+    }
+
     .share-area {
       margin-top: 18px;
       display: flex;
@@ -163,23 +168,10 @@
     }
 
     @media (max-width: 480px) {
-      body {
-        padding: 18px;
-        align-items: flex-start;
-      }
-
-      .card {
-        padding: 30px 20px 24px;
-        border-radius: 24px;
-      }
-
-      h1 {
-        font-size: 30px;
-      }
-
-      .title {
-        font-size: 23px;
-      }
+      body { padding: 18px; align-items: flex-start; }
+      .card { padding: 30px 20px 24px; border-radius: 24px; }
+      h1 { font-size: 30px; }
+      .title { font-size: 23px; }
     }
   </style>
 </head>
@@ -190,7 +182,8 @@
       <h1>余白おみくじ</h1>
       <p class="lead">
         今日のあなたに必要な<br />
-        小さな余白をひとつ、引いてみてください。
+        小さな余白をひとつ、引いてみてください。<br />
+        <small>1日1回だけ引けます。</small>
       </p>
 
       <button onclick="drawOmikuji()">おみくじを引く</button>
@@ -203,10 +196,10 @@
           <span>今日の小さな行動</span>
           <div id="action"></div>
         </div>
+        <div id="notice" class="notice"></div>
 
         <div class="share-area">
           <button class="sub-button" onclick="copyResult()">結果をコピー</button>
-          <button class="sub-button" onclick="drawOmikuji()">もう一度引く</button>
         </div>
       </div>
     </section>
@@ -252,28 +245,54 @@
 
     let currentResult = null;
 
+    function getTodayKey() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
     function drawOmikuji() {
+      const today = getTodayKey();
+      const savedDate = localStorage.getItem("yohakuOmikujiDate");
+      const savedResult = localStorage.getItem("yohakuOmikujiResult");
+
+      if (savedDate === today && savedResult) {
+        currentResult = JSON.parse(savedResult);
+        showResult(currentResult, "今日はすでに引いています。今日はこの余白でいきましょう。");
+        return;
+      }
+
+      const randomIndex = Math.floor(Math.random() * omikujiList.length);
+      currentResult = omikujiList[randomIndex];
+
+      localStorage.setItem("yohakuOmikujiDate", today);
+      localStorage.setItem("yohakuOmikujiResult", JSON.stringify(currentResult));
+
+      showResult(currentResult, "今日の余白が出ました。無理せず、少しだけ意識してみてください。");
+    }
+
+    function showResult(result, noticeText) {
       const resultBox = document.getElementById("result");
       resultBox.classList.remove("show");
 
       setTimeout(() => {
-        const randomIndex = Math.floor(Math.random() * omikujiList.length);
-        currentResult = omikujiList[randomIndex];
-
-        document.getElementById("luck").textContent = currentResult.luck;
-        document.getElementById("title").textContent = currentResult.title;
-        document.getElementById("message").textContent = currentResult.message;
-        document.getElementById("action").textContent = currentResult.action;
+        document.getElementById("luck").textContent = result.luck;
+        document.getElementById("title").textContent = result.title;
+        document.getElementById("message").textContent = result.message;
+        document.getElementById("action").textContent = result.action;
+        document.getElementById("notice").textContent = noticeText || "";
 
         resultBox.style.display = "block";
         setTimeout(() => resultBox.classList.add("show"), 20);
-      }, 220);
+      }, 180);
     }
 
     function copyResult() {
       if (!currentResult) return;
 
-      const text = `【余白おみくじ】\n${currentResult.luck}｜${currentResult.title}\n${currentResult.message}\n\n今日の小さな行動：${currentResult.action}`;
+      const text = `【余白おみくじ】\n${currentResult.luck}｜${currentResult.title}\n${currentResult.message}\n\n今日の小さな行動：${currentResult.action}\n\nhttps://aoki219-stack.github.io/yohaku-omikuji/`;
 
       navigator.clipboard.writeText(text).then(() => {
         alert("結果をコピーしました");
