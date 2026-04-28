@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>余白おみくじ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      background: linear-gradient(135deg, #f8f4ed 0%, #eef3f5 55%, #f7efe7 100%);
+      color: #3f3a35;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 28px;
+      padding: 34px 26px 30px;
+      box-shadow: 0 18px 45px rgba(90, 80, 70, 0.12);
+      backdrop-filter: blur(12px);
+    }
+
+    .label {
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      color: #8c8176;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 34px;
+      font-weight: 500;
+      margin: 0 0 14px;
+      letter-spacing: 0.06em;
+    }
+
+    .lead {
+      font-size: 15px;
+      line-height: 1.9;
+      color: #6c6259;
+      margin: 0 0 28px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 15px 34px;
+      font-size: 16px;
+      letter-spacing: 0.08em;
+      background: #6f7f78;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(80, 90, 84, 0.22);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(80, 90, 84, 0.28);
+    }
+
+    button:active {
+      transform: translateY(0);
+      opacity: 0.9;
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 26px 20px;
+      border-radius: 24px;
+      background: rgba(248, 246, 241, 0.88);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .luck {
+      display: inline-block;
+      font-size: 15px;
+      letter-spacing: 0.2em;
+      color: white;
+      background: #b59b7b;
+      border-radius: 999px;
+      padding: 8px 18px;
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 25px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    .message {
+      font-size: 16px;
+      line-height: 1.9;
+      color: #514940;
+      margin-bottom: 20px;
+    }
+
+    .action-box {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #6b5f55;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 18px;
+      padding: 14px 16px;
+    }
+
+    .action-box span {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      color: #9a8f84;
+      margin-bottom: 4px;
+    }
+
+    .share-area {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .sub-button {
+      background: rgba(255, 255, 255, 0.88);
+      color: #6f7f78;
+      border: 1px solid rgba(111, 127, 120, 0.28);
+      box-shadow: none;
+      padding: 11px 18px;
+      font-size: 13px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #948b82;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 18px;
+        align-items: flex-start;
+      }
+
+      .card {
+        padding: 30px 20px 24px;
+        border-radius: 24px;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+
+      .title {
+        font-size: 23px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="card">
+      <div class="label">Yohaku Omikuji</div>
+      <h1>余白おみくじ</h1>
+      <p class="lead">
+        今日のあなたに必要な<br />
+        小さな余白をひとつ、引いてみてください。
+      </p>
+
+      <button onclick="drawOmikuji()">おみくじを引く</button>
+
+      <div id="result" class="result">
+        <div id="luck" class="luck"></div>
+        <div id="title" class="title"></div>
+        <div id="message" class="message"></div>
+        <div class="action-box">
+          <span>今日の小さな行動</span>
+          <div id="action"></div>
+        </div>
+
+        <div class="share-area">
+          <button class="sub-button" onclick="copyResult()">結果をコピー</button>
+          <button class="sub-button" onclick="drawOmikuji()">もう一度引く</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      余白人｜今日を少し軽くするおみくじ
+    </div>
+  </main>
+
+  <script>
+    const omikujiList = [
+      { luck: "大吉", title: "減らす日", message: "今日は予定をひとつ減らすと、心に余白が戻ります。", action: "やらないことを1つ決める" },
+      { luck: "大吉", title: "静けさの日", message: "静かな時間が、あなたの調子を整えてくれます。", action: "5分だけ音を消す" },
+      { luck: "大吉", title: "深呼吸の日", message: "急がなくても大丈夫です。呼吸を整えるだけで流れが変わります。", action: "ゆっくり3回深呼吸する" },
+      { luck: "大吉", title: "手放す日", message: "抱えすぎていたものを少し下ろしていい日です。", action: "気になることを紙に書く" },
+      { luck: "大吉", title: "自分優先の日", message: "今日は少しだけ、自分の都合を大切にしてみてください。", action: "自分の予定を先に入れる" },
+      { luck: "中吉", title: "ゆっくり進む日", message: "早く進むより、乱れず進むほうが合っています。", action: "歩く速度を少し落とす" },
+      { luck: "中吉", title: "整える日", message: "心の乱れは、身の回りを少し整えると落ち着きます。", action: "机の上を1分片づける" },
+      { luck: "中吉", title: "聞きすぎない日", message: "人の声を入れすぎると、自分の声が小さくなります。", action: "SNSを見る時間を減らす" },
+      { luck: "中吉", title: "余白を守る日", message: "何もしない時間にも、ちゃんと意味があります。", action: "空白の10分を作る" },
+      { luck: "中吉", title: "軽くする日", message: "全部を完璧にしなくても、今日は十分進んでいます。", action: "60点で終わらせる" },
+      { luck: "小吉", title: "立ち止まる日", message: "止まることは、遅れることではありません。整える時間です。", action: "一度スマホを置く" },
+      { luck: "小吉", title: "比べない日", message: "誰かの速度ではなく、自分の呼吸に戻る日です。", action: "昨日の自分だけを見る" },
+      { luck: "小吉", title: "小さく始める日", message: "大きく変えなくて大丈夫。小さな一歩で十分です。", action: "1分だけ始める" },
+      { luck: "小吉", title: "沈黙の日", message: "無理に話さなくても、心はちゃんと動いています。", action: "黙ってお茶を飲む" },
+      { luck: "小吉", title: "待つ日", message: "答えを急がないほうが、見えてくるものがあります。", action: "返事を少し遅らせる" },
+      { luck: "吉", title: "朝を味方にする日", message: "朝の数分が、一日の余白を作ってくれます。", action: "朝に窓を開ける" },
+      { luck: "吉", title: "帰り道の日", message: "帰り道にこそ、本当の気持ちが出やすいものです。", action: "少し遠回りする" },
+      { luck: "吉", title: "整わなくていい日", message: "乱れている自分を責めなくて大丈夫です。", action: "今日は無理に整えない" },
+      { luck: "吉", title: "ひと息の日", message: "一度止まるだけで、心の向きが少し変わります。", action: "温かい飲み物を飲む" },
+      { luck: "吉", title: "余計な一言を飲み込む日", message: "言わないことで守れる余白もあります。", action: "一拍置いて話す" },
+      { luck: "末吉", title: "疲れに気づく日", message: "頑張れないのではなく、少し疲れているだけかもしれません。", action: "今日は早めに休む" },
+      { luck: "末吉", title: "予定を詰めない日", message: "空いている時間を、すぐ埋めなくても大丈夫です。", action: "空白をそのまま残す" },
+      { luck: "末吉", title: "心を急かさない日", message: "気持ちは、命令してもすぐには整いません。", action: "焦りを言葉にする" },
+      { luck: "末吉", title: "弱さを許す日", message: "少し弱っている自分にも、居場所をあげてください。", action: "無理な約束をしない" },
+      { luck: "末吉", title: "音を減らす日", message: "情報が多すぎると、心の余白が見えにくくなります。", action: "通知を1つ切る" },
+      { luck: "凶", title: "頑張らない日", message: "今日は無理に上げなくていい日です。下げ止まるだけで十分です。", action: "最低限だけやる" },
+      { luck: "凶", title: "抱えすぎ注意", message: "今の重さは、全部ひとりで持つ量ではないかもしれません。", action: "誰かに一言だけ頼る" },
+      { luck: "凶", title: "心の渋滞の日", message: "考えが多すぎる日は、整理より休息が先です。", action: "考えるのを一度やめる" },
+      { luck: "凶", title: "反応しない日", message: "すぐ反応しないことで、自分を守れる日です。", action: "返信前に深呼吸する" },
+      { luck: "凶", title: "休む勇気の日", message: "休むことは、逃げではなく整備です。", action: "今日は早く寝る" }
+    ];
+
+    let currentResult = null;
+
+    function drawOmikuji() {
+      const resultBox = document.getElementById("result");
+      resultBox.classList.remove("show");
+
+      setTimeout(() => {
+        const randomIndex = Math.floor(Math.random() * omikujiList.length);
+        currentResult = omikujiList[randomIndex];
+
+        document.getElementById("luck").textContent = currentResult.luck;
+        document.getElementById("title").textContent = currentResult.title;
+        document.getElementById("message").textContent = currentResult.message;
+        document.getElementById("action").textContent = currentResult.action;
+
+        resultBox.style.display = "block";
+        setTimeout(() => resultBox.classList.add("show"), 20);
+      }, 220);
+    }
+
+    function copyResult() {
+      if (!currentResult) return;
+
+      const text = `【余白おみくじ】\n${currentResult.luck}｜${currentResult.title}\n${currentResult.message}\n\n今日の小さな行動：${currentResult.action}`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert("結果をコピーしました");
+      }).catch(() => {
+        alert("コピーできませんでした");
+      });
+    }
+  </script>
+</body>
+</html>
